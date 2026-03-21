@@ -861,6 +861,26 @@ class HouseShareApp {
         }
     }
 
+    // 初始化房源页面组件
+    initPropertiesComponents() {
+        // 房源页面组件初始化
+    }
+
+    // 初始化客户页面组件
+    initClientsComponents() {
+        // 客户页面组件初始化
+    }
+
+    // 初始化发布页面组件
+    initPublishComponents() {
+        // 发布页面组件初始化
+    }
+
+    // 初始化我的页面组件
+    initProfileComponents() {
+        // 我的页面组件初始化
+    }
+
     // 显示错误信息
     showError(message) {
         const errorElement = document.getElementById('pageContent');
