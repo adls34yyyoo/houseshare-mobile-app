@@ -9,7 +9,9 @@ class HouseShareApp {
 
     // 初始化应用
     async init() {
+        console.log('HouseShareApp 开始初始化...');
         try {
+            console.log('注册 Service Worker...');
             // 注册 Service Worker (使用相对路径适配GitHub Pages)
             if ('serviceWorker' in navigator) {
                 try {
@@ -231,6 +233,7 @@ class HouseShareApp {
 
     // 加载页面
     async loadPage(pageName) {
+        console.log('loadPage 被调用:', pageName);
         try {
             this.showLoading();
             
@@ -838,32 +841,138 @@ class HouseShareApp {
 
     // 初始化首页组件
     initHomeComponents() {
+        console.log('初始化首页组件...');
         // 绑定按钮事件
         const addPropertyBtn = document.getElementById('addPropertyBtn');
         const viewPropertiesBtn = document.getElementById('viewPropertiesBtn');
         const addClientBtn = document.getElementById('addClientBtn');
         const publishBtn = document.getElementById('publishBtn');
         
+        console.log('首页按钮元素:', {addPropertyBtn, viewPropertiesBtn, addClientBtn, publishBtn});
+        
         if (addPropertyBtn) {
-            addPropertyBtn.onclick = () => this.loadPage('properties');
+            addPropertyBtn.onclick = () => {
+                console.log('点击新增房源按钮');
+                this.loadPage('properties');
+            };
         }
         
         if (viewPropertiesBtn) {
-            viewPropertiesBtn.onclick = () => this.loadPage('properties');
+            viewPropertiesBtn.onclick = () => {
+                console.log('点击查看房源按钮');
+                this.loadPage('properties');
+            };
         }
         
         if (addClientBtn) {
-            addClientBtn.onclick = () => this.loadPage('clients');
+            addClientBtn.onclick = () => {
+                console.log('点击新增客户按钮');
+                this.loadPage('clients');
+            };
         }
         
         if (publishBtn) {
-            publishBtn.onclick = () => this.loadPage('publish');
+            publishBtn.onclick = () => {
+                console.log('点击发布按钮');
+                this.loadPage('publish');
+            };
         }
     }
 
     // 初始化房源页面组件
     initPropertiesComponents() {
-        // 房源页面组件初始化
+        // 绑定新增房源按钮
+        const addNewPropertyBtn = document.getElementById('addNewPropertyBtn');
+        if (addNewPropertyBtn) {
+            addNewPropertyBtn.onclick = () => this.showAddPropertyModal();
+        }
+        
+        // 绑定筛选按钮
+        const filterPropertiesBtn = document.getElementById('filterPropertiesBtn');
+        if (filterPropertiesBtn) {
+            filterPropertiesBtn.onclick = () => this.showFilterModal();
+        }
+    }
+    
+    // 显示新增房源弹窗
+    showAddPropertyModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.id = 'addPropertyModal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>新增房源</h2>
+                    <button class="modal-close" onclick="app.closeModal('addPropertyModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="addPropertyForm">
+                        <div class="form-group">
+                            <label>房源标题</label>
+                            <input type="text" id="propertyTitle" required placeholder="请输入房源标题">
+                        </div>
+                        <div class="form-group">
+                            <label>位置</label>
+                            <input type="text" id="propertyLocation" required placeholder="请输入位置">
+                        </div>
+                        <div class="form-group">
+                            <label>面积 (㎡)</label>
+                            <input type="number" id="propertyArea" required placeholder="请输入面积">
+                        </div>
+                        <div class="form-group">
+                            <label>价格 (万元)</label>
+                            <input type="number" id="propertyPrice" required placeholder="请输入价格">
+                        </div>
+                        <div class="form-group">
+                            <label>状态</label>
+                            <select id="propertyStatus">
+                                <option value="available">待售</option>
+                                <option value="pending">待定</option>
+                                <option value="sold">已售</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">保存</button>
+                    </form>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // 绑定表单提交
+        document.getElementById('addPropertyForm').onsubmit = (e) => {
+            e.preventDefault();
+            this.saveProperty();
+        };
+    }
+    
+    // 保存房源
+    saveProperty() {
+        const property = {
+            id: Date.now().toString(),
+            title: document.getElementById('propertyTitle').value,
+            location: document.getElementById('propertyLocation').value,
+            area: document.getElementById('propertyArea').value,
+            price: document.getElementById('propertyPrice').value,
+            status: document.getElementById('propertyStatus').value
+        };
+        
+        this.properties.push(property);
+        this.saveData();
+        this.closeModal('addPropertyModal');
+        this.loadPage('properties');
+    }
+    
+    // 显示筛选弹窗
+    showFilterModal() {
+        alert('筛选功能开发中...');
+    }
+    
+    // 关闭弹窗
+    closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.remove();
+        }
     }
 
     // 初始化客户页面组件
@@ -898,11 +1007,13 @@ class HouseShareApp {
 
     // 绑定事件
     bindEvents() {
+        console.log('绑定导航点击事件...');
         // 绑定导航点击事件
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 const pageName = item.dataset.page;
+                console.log('导航点击:', pageName);
                 this.loadPage(pageName);
             });
         });
