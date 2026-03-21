@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 手机APP优化视口 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1A73E8">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- PWA配置 -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    
+    <title>HouseShare - 房源朋友圈</title>
+    
+    <!-- 样式文件 -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/remixicon-local.css">
+    
+    <!-- 移动端优化 -->
+    <style>
+        /* 防止点击延迟 */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            tap-highlight-color: transparent;
+        }
+        
+        /* 防止文字选择 */
+        *:not(input):not(textarea):not(select) {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        /* 滚动优化 */
+        body {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
+        }
+        
+        /* 安全区域适配 */
+        .safe-area-top {
+            padding-top: env(safe-area-inset-top);
+        }
+        
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        /* 防止横向滚动 */
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- 底部导航栏 -->
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="#home" class="nav-item active" data-page="home">
+            <i class="ri-home-4-line"></i>
+            <span>首页</span>
+        </a>
+        <a href="#properties" class="nav-item" data-page="properties">
+            <i class="ri-building-2-line"></i>
+            <span>房源</span>
+        </a>
+        <a href="#clients" class="nav-item" data-page="clients">
+            <i class="ri-user-3-line"></i>
+            <span>客户</span>
+        </a>
+        <a href="#publish" class="nav-item" data-page="publish">
+            <i class="ri-share-forward-line"></i>
+            <span>发布</span>
+        </a>
+        <a href="#profile" class="nav-item" data-page="profile">
+            <i class="ri-user-line"></i>
+            <span>我的</span>
+        </a>
+    </nav>
+    
+    <!-- 顶部状态栏 -->
+    <div class="status-bar safe-area-top">
+        <div class="status-time" id="currentTime">14:30</div>
+        <div class="status-icons">
+            <i class="ri-wifi-line"></i>
+            <i class="ri-battery-2-charge-line"></i>
+        </div>
+    </div>
+    
+    <!-- 应用内容容器 -->
+    <main class="app-container" id="appContainer">
+        <!-- 首页内容由JavaScript动态加载 -->
+        <div class="page-content" id="pageContent">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>加载中...</p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 浮动按钮 -->
+    <button class="fab" id="addButton">
+        <i class="ri-add-line"></i>
+    </button>
+    
+    <!-- 脚本文件 -->
+    <script src="js/app.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>

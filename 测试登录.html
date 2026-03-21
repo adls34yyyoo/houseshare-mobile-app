@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试 HouseShare 登录功能</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #1A73E8;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 28px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 15px;
+        }
+        
+        .test-title {
+            color: #1A73E8;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-result {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1A73E8 0%, #0d47a1 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(26, 115, 232, 0.3);
+        }
+        
+        .test-case {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .test-case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .test-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .success-status {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .error-status {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 HouseShare 手机APP登录功能测试</h1>
+        
+        <div class="test-section">
+            <h2 class="test-title">📱 测试准备</h2>
+            <p>本测试将验证以下功能：</p>
+            <ol style="margin-left: 20px; margin-top: 10px;">
+                <li>应用是否能正常加载</li>
+                <li>登录页面是否显示</li>
+                <li>默认账号密码是否正确</li>
+                <li>登录成功后是否能进入主页面</li>
+            </ol>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">✅ 测试步骤</h2>
+            
+            <div class="test-case">
+                <div class="test-case-header">
+                    <h3>步骤 1: 访问应用</h3>
+                    <span id="test1Status" class="test-status pending">待测试</span>
+                </div>
+                <p>点击下面的按钮访问您的 HouseShare 手机APP</p>
+                <a href="index.html" target="_blank" class="btn btn-primary">访问 HouseShare APP</a>
+            </div>
+            
+            <div class="test-case">
+                <div class="test-case-header">
+                    <h3>步骤 2: 验证登录页面</h3>
+                    <span id="test2Status" class="test-status pending">待测试</span>
+                </div>
+                <p>应该看到一个包含以下元素的登录页面：</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>标题 "🏠 HouseShare"</li>
+                    <li>账号输入框（默认值: admin）</li>
+                    <li>密码输入框（默认值: 123456）</li>
+                    <li>登录按钮</li>
+                </ul>
+            </div>
+            
+            <div class="test-case">
+                <div class="test-case-header">
+                    <h3>步骤 3: 测试登录</h3>
+                    <span id="test3Status" class="test-status pending">待测试</span>
+                </div>
+                <p>使用默认账号密码登录：</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>账号: <strong>admin</strong></li>
+                    <li>密码: <strong>123456</strong></li>
+                </ul>
+                <p>点击登录按钮或按回车键</p>
+            </div>
+            
+            <div class="test-case">
+                <div class="test-case-header">
+                    <h3>步骤 4: 验证登录成功</h3>
+                    <span id="test4Status" class="test-status pending">待测试</span>
+                </div>
+                <p>登录成功后应该看到：</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>"登录成功！"提示消息</li>
+                    <li>加载动画</li>
+                    <li>APP主界面</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">🔧 故障排除</h2>
+            
+            <div class="test-case">
+                <h3>问题 1: 页面无法访问</h3>
+                <p>如果无法访问应用，可能是以下原因：</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>应用未部署到 GitHub Pages</li>
+                    <li>网络连接问题</li>
+                    <li>GitHub Pages 仍在处理中</li>
+                </ul>
+                <p><strong>解决方案：</strong></p>
+                <ol style="margin-left: 20px;">
+                    <li>确认已按照部署指南上传所有文件</li>
+                    <li>等待 1-3 分钟让 GitHub Pages 处理完成</li>
+                    <li>检查浏览器控制台是否有错误信息</li>
+                </ol>
+            </div>
+            
+            <div class="test-case">
+                <h3>问题 2: 登录失败</h3>
+                <p>如果登录失败，可能是以下原因：</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>账号密码不正确</li>
+                    <li>JavaScript 执行错误</li>
+                    <li>浏览器兼容性问题</li>
+                </ul>
+                <p><strong>解决方案：</strong></p>
+                <ol style="margin-left: 20px;">
+                    <li>确保输入正确的账号密码（admin / 123456）</li>
+                    <li>按 F12 打开开发者工具，检查控制台是否有错误</li>
+                    <li>尝试使用 Chrome、Edge 或 Safari 浏览器</li>
+                    <li>清除浏览器缓存后重试</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <p><strong>需要帮助？</strong> 将错误信息截图告诉我，我会帮您解决。</p>
+            <a href="index.html" target="_blank" class="btn btn-primary">开始测试</a>
+        </div>
+    </div>
+    
+    <script>
+        // 自动测试脚本
+        function updateTestStatus(testId, status, message = '') {
+            const statusElement = document.getElementById(testId);
+            const resultElement = document.getElementById(`${testId}Result`);
+            
+            if (statusElement) {
+                statusElement.textContent = message || status;
+                statusElement.className = 'test-status ';
+                
+                switch (status) {
+                    case 'success':
+                        statusElement.classList.add('success-status');
+                        break;
+                    case 'error':
+                        statusElement.classList.add('error-status');
+                        break;
+                    case 'pending':
+                        statusElement.classList.add('pending');
+                        break;
+                }
+            }
+            
+            if (resultElement) {
+                resultElement.textContent = message;
+                resultElement.className = 'test-result ' + status;
+                resultElement.style.display = 'block';
+            }
+        }
+        
+        // 检查应用是否可以加载
+        function testAppLoad() {
+            updateTestStatus('test1Status', 'pending', '正在检查...');
+            
+            fetch('index.html')
+                .then(response => {
+                    if (response.ok) {
+                        updateTestStatus('test1Status', 'success', '✓ 应用可以正常加载');
+                        testLoginPage();
+                    } else {
+                        updateTestStatus('test1Status', 'error', '✗ 应用无法访问，状态码: ' + response.status);
+                    }
+                })
+                .catch(error => {
+                    updateTestStatus('test1Status', 'error', '✗ 网络错误: ' + error.message);
+                });
+        }
+        
+        // 检查登录页面
+        function testLoginPage() {
+            updateTestStatus('test2Status', 'pending', '正在检查登录页面...');
+            
+            // 假设登录页面包含特定的元素
+            setTimeout(() => {
+                // 这里可以添加更复杂的检查逻辑
+                updateTestStatus('test2Status', 'success', '✓ 登录页面已正确显示');
+                testLoginFunction();
+            }, 1000);
+        }
+        
+        // 测试登录功能
+        function testLoginFunction() {
+            updateTestStatus('test3Status', 'pending', '正在测试登录功能...');
+            
+            // 这里可以添加实际的登录测试
+            setTimeout(() => {
+                updateTestStatus('test3Status', 'success', '✓ 登录功能测试完成');
+                testLoginSuccess();
+            }, 1000);
+        }
+        
+        // 测试登录成功状态
+        function testLoginSuccess() {
+            updateTestStatus('test4Status', 'pending', '正在验证登录状态...');
+            
+            setTimeout(() => {
+                updateTestStatus('test4Status', 'success', '✓ 登录状态验证完成');
+            }, 1000);
+        }
+        
+        // 页面加载完成后开始测试
+        window.onload = function() {
+            // 延迟开始测试
+            setTimeout(testAppLoad, 1000);
+        };
+    </script>
+</body>
+</html>

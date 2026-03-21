@@ -1,0 +1,53 @@
+# 🎯 HouseShare - 最简单图标解决方案
+
+## 🔧 问题
+您的网站显示404错误，因为缺少PNG图标文件。
+
+## 🚀 解决方案（3选1）
+
+### 方案1：使用在线工具（推荐）
+1. 访问：https://realfavicongenerator.net/
+2. 上传任意图片（如房屋图片）
+3. 点击"Generate your Favicons and HTML code"
+4. 下载图标包（ZIP文件）
+5. 解压到：`mobile-app/assets/icons/` 文件夹
+
+### 方案2：使用我创建的生成器
+1. 双击：`icon-generator-real.html`
+2. 自定义图标样式
+3. 点击"生成所有图标"
+4. 点击"下载图标包"
+5. 按照页面说明保存图标
+
+### 方案3：手动创建简单图标
+1. 打开画图工具（Windows自带）
+2. 创建192×192像素的蓝色方块
+3. 保存为：`icon-192x192.png`
+4. 复制这个文件，重命名为其他尺寸：
+   - `icon-72x72.png`
+   - `icon-96x96.png`
+   - `icon-128x128.png`
+   - `icon-144x144.png`
+   - `icon-152x152.png`
+   - `icon-384x384.png`
+   - `icon-512x512.png`
+5. 所有文件放入：`mobile-app/assets/icons/`
+
+## 📁 必须创建的文件
+```
+mobile-app/assets/icons/
+├── icon-72x72.png
+├── icon-96x96.png
+├── icon-128x128.png
+├── icon-144x144.png
+├── icon-152x152.png
+├── icon-192x192.png    ← 最重要！
+├── icon-384x384.png
+└── icon-512x512.png
+```
+
+## 🎯 立即操作
+1. **选择方案1**（最简单）
+2. 创建图标文件
+3. 重新上传到GitHub
+4. 网站即可恢复正常

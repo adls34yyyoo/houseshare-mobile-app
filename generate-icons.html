@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HouseShare APP 图标生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #1A73E8, #34A853);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #1A73E8;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .icon-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .icon-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+        
+        .icon-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .icon-canvas {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #1A73E8, #34A853);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .icon-info {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .icon-size {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .generator {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .generator h2 {
+            color: #1A73E8;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #1A73E8;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .color-input {
+            width: 60px;
+            height: 40px;
+            padding: 0;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #1A73E8;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1557B0;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #34A853;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #2d8c47;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #1A73E8;
+            border: 2px solid #1A73E8;
+        }
+        
+        .btn-outline:hover {
+            background: #f0f7ff;
+        }
+        
+        .instructions {
+            background: #e8f0fe;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .instructions h3 {
+            color: #1A73E8;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .icon-preview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .icon-preview {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 HouseShare APP 图标生成器</h1>
+            <p>为您的房源管理应用生成专业图标文件</p>
+        </div>
+        
+        <div class="icon-preview">
+            <div class="icon-item">
+                <div class="icon-canvas" style="background: linear-gradient(135deg, #1A73E8, #34A853);">
+                    HS
+                </div>
+                <div class="icon-info">主图标</div>
+                <div class="icon-size">512×512</div>
+            </div>
+            
+            <div class="icon-item">
+                <div class="icon-canvas" style="background: linear-gradient(135deg, #1A73E8, #34A853); width: 72px; height: 72px;">
+                    HS
+                </div>
+                <div class="icon-info">中图标</div>
+                <div class="icon-size">192×192</div>
+            </div>
+            
+            <div class="icon-item">
+                <div class="icon-canvas" style="background: linear-gradient(135deg, #1A73E8, #34A853); width: 48px; height: 48px; font-size: 20px;">
+                    HS
+                </div>
+                <div class="icon-info">小图标</div>
+                <div class="icon-size">72×72</div>
+            </div>
+            
+            <div class="icon-item">
+                <div class="icon-canvas" style="background: linear-gradient(135deg, #1A73E8, #34A853); width: 32px; height: 32px; font-size: 14px; border-radius: 8px;">
+                    HS
+                </div>
+                <div class="icon-info">最小图标</div>
+                <div class="icon-size">32×32</div>
+            </div>
+        </div>
+        
+        <div class="generator">
+            <h2>自定义图标生成</h2>
+            
+            <div class="form-group">
+                <label class="form-label">应用名称</label>
+                <input type="text" class="form-control" id="appName" value="HouseShare" placeholder="请输入应用名称">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">图标文本</label>
+                <input type="text" class="form-control" id="iconText" value="HS" placeholder="请输入图标文本（1-3个字符）">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">图标颜色</label>
+                <div class="color-picker">
+                    <input type="color" class="color-input" id="primaryColor" value="#1A73E8">
+                    <input type="color" class="color-input" id="secondaryColor" value="#34A853">
+                    <span>主色 / 辅色</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">图标形状</label>
+                <select class="form-control" id="iconShape">
+                    <option value="square">方形</option>
+                    <option value="rounded">圆角方形</option>
+                    <option value="circle">圆形</option>
+                </select>
+            </div>
+            
+            <div class="actions">
+                <button class="btn btn-primary" onclick="generateIcons()">
+                    <i class="ri-download-line"></i> 生成图标包
+                </button>
+                <button class="btn btn-secondary" onclick="previewIcons()">
+                    <i class="ri-eye-line"></i> 预览效果
+                </button>
+                <button class="btn btn-outline" onclick="saveConfig()">
+                    <i class="ri-save-line"></i> 保存配置
+                </button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📱 安装说明</h3>
+            <ol>
+                <li><strong>生成图标</strong>：点击"生成图标包"按钮，下载所有尺寸的图标文件</li>
+                <li><strong>放置图标</strong>：将生成的图标文件放入 <code>mobile-app/assets/icons/</code> 文件夹</li>
+                <li><strong>测试安装</strong>：在手机浏览器中访问您的应用，点击"添加到主屏幕"</li>
+                <li><strong>PWA配置</strong>：确保 <code>manifest.json</code> 文件正确配置了所有图标</li>
+                <li><strong>发布应用</strong>：将整个 <code>mobile-app</code> 文件夹部署到服务器</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // 更新预览
+        function updatePreview() {
+            const appName = document.getElementById('appName').value;
+            const iconText = document.getElementById('iconText').value;
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+            const iconShape = document.getElementById('iconShape').value;
+            
+            // 更新所有预览
+            const previews = document.querySelectorAll('.icon-canvas');
+            previews.forEach(preview => {
+                preview.style.background = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`;
+                preview.textContent = iconText;
+                
+                // 设置形状
+                if (iconShape === 'circle') {
+                    preview.style.borderRadius = '50%';
+                } else if (iconShape === 'rounded') {
+                    preview.style.borderRadius = '20px';
+                } else {
+                    preview.style.borderRadius = '10px';
+                }
+            });
+        }
+        
+        // 生成图标
+        function generateIcons() {
+            const appName = document.getElementById('appName').value;
+            const iconText = document.getElementById('iconText').value;
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+            const iconShape = document.getElementById('iconShape').value;
+            
+            // 创建配置对象
+            const config = {
+                appName,
+                iconText,
+                primaryColor,
+                secondaryColor,
+                iconShape,
+                generatedAt: new Date().toISOString()
+            };
+            
+            // 创建下载链接
+            const configStr = JSON.stringify(config, null, 2);
+            const blob = new Blob([configStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            // 下载配置文件
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'houseshare-icon-config.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+            
+            // 提示用户
+            alert(`图标配置已保存！\n\n接下来需要：\n1. 使用专业工具（如Figma、Photoshop）创建图标\n2. 保存为以下尺寸：\n   - 512×512\n   - 384×384\n   - 192×192\n   - 152×152\n   - 144×144\n   - 128×128\n   - 96×96\n   - 72×72\n3. 放入 mobile-app/assets/icons/ 文件夹`);
+        }
+        
+        // 预览效果
+        function previewIcons() {
+            updatePreview();
+            alert('预览已更新！\n\n注意：这只是简单的预览，实际图标需要专业设计工具创建。');
+        }
+        
+        // 保存配置
+        function saveConfig() {
+            const config = {
+                appName: document.getElementById('appName').value,
+                iconText: document.getElementById('iconText').value,
+                primaryColor: document.getElementById('primaryColor').value,
+                secondaryColor: document.getElementById('secondaryColor').value,
+                iconShape: document.getElementById('iconShape').value
+            };
+            
+            localStorage.setItem('houseshare_icon_config', JSON.stringify(config));
+            alert('配置已保存到浏览器本地存储！');
+        }
+        
+        // 加载保存的配置
+        function loadConfig() {
+            const savedConfig = localStorage.getItem('houseshare_icon_config');
+            if (savedConfig) {
+                const config = JSON.parse(savedConfig);
+                
+                document.getElementById('appName').value = config.appName || 'HouseShare';
+                document.getElementById('iconText').value = config.iconText || 'HS';
+                document.getElementById('primaryColor').value = config.primaryColor || '#1A73E8';
+                document.getElementById('secondaryColor').value = config.secondaryColor || '#34A853';
+                document.getElementById('iconShape').value = config.iconShape || 'square';
+                
+                updatePreview();
+            }
+        }
+        
+        // 绑定输入事件
+        document.getElementById('appName').addEventListener('input', updatePreview);
+        document.getElementById('iconText').addEventListener('input', updatePreview);
+        document.getElementById('primaryColor').addEventListener('input', updatePreview);
+        document.getElementById('secondaryColor').addEventListener('input', updatePreview);
+        document.getElementById('iconShape').addEventListener('change', updatePreview);
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfig();
+            updatePreview();
+        });
+    </script>
+</body>
+</html>

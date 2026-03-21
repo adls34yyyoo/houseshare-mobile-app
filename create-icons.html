@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HouseShare APP图标生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1A73E8 0%, #0d47a1 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .icon-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .icon-section {
+            text-align: center;
+        }
+        
+        .icon-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1A73E8;
+        }
+        
+        .icon-display {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #1A73E8 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(26, 115, 232, 0.3);
+            margin: 0 auto 15px;
+        }
+        
+        .icon-display.large {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .icon-text {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .icon-text.large {
+            font-size: 72px;
+        }
+        
+        .download-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1A73E8 0%, #0d47a1 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(26, 115, 232, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .instructions {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 40px;
+        }
+        
+        .instructions h3 {
+            color: #1A73E8;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f1f5f9;
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 HouseShare APP图标生成器</h1>
+            <p>一键生成专业的房源管理应用图标</p>
+        </div>
+        
+        <div class="content">
+            <div class="icon-preview">
+                <div class="icon-section">
+                    <h3 class="icon-title">小图标 (192×192像素)</h3>
+                    <div class="icon-display">
+                        <div class="icon-text">HS</div>
+                    </div>
+                    <div class="download-buttons">
+                        <button class="btn btn-primary" onclick="generateIcon(192)">生成192×192图标</button>
+                        <button class="btn btn-secondary" onclick="previewIcon(192)">预览PNG效果</button>
+                    </div>
+                </div>
+                
+                <div class="icon-section">
+                    <h3 class="icon-title">大图标 (512×512像素)</h3>
+                    <div class="icon-display large">
+                        <div class="icon-text large">HS</div>
+                    </div>
+                    <div class="download-buttons">
+                        <button class="btn btn-primary" onclick="generateIcon(512)">生成512×512图标</button>
+                        <button class="btn btn-secondary" onclick="previewIcon(512)">预览PNG效果</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3>📋 使用说明：</h3>
+                <ol>
+                    <li>点击上方的按钮生成对应尺寸的图标</li>
+                    <li>生成的图标会自动保存到您的下载文件夹</li>
+                    <li>将图标文件重命名为：
+                        <ul>
+                            <li><code>icon-192.png</code> (小图标)</li>
+                            <li><code>icon-512.png</code> (大图标)</li>
+                        </ul>
+                    </li>
+                    <li>将图标文件复制到 <code>mobile-app</code> 文件夹中</li>
+                    <li>重新运行部署检查脚本确认图标文件已就绪</li>
+                </ol>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="generateAllIcons()" style="padding: 15px 40px; font-size: 18px;">
+                    🚀 一键生成所有图标
+                </button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 HouseShare 房源管理系统 | 专业打造，简单易用</p>
+        </div>
+    </div>
+    
+    <div id="successMessage" class="success-message">
+        ✅ 图标生成成功！已保存到下载文件夹
+    </div>
+    
+    <script>
+        function showSuccessMessage() {
+            const message = document.getElementById('successMessage');
+            message.style.display = 'block';
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+        
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // 创建渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#1A73E8');
+            gradient.addColorStop(1, '#764ba2');
+            
+            // 绘制圆角矩形背景
+            ctx.fillStyle = gradient;
+            const radius = size * 0.1;
+            ctx.beginPath();
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(size - radius, 0);
+            ctx.quadraticCurveTo(size, 0, size, radius);
+            ctx.lineTo(size, size - radius);
+            ctx.quadraticCurveTo(size, size, size - radius, size);
+            ctx.lineTo(radius, size);
+            ctx.quadraticCurveTo(0, size, 0, size - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+            ctx.fill();
+            
+            // 添加阴影效果
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetY = 5;
+            
+            // 绘制文字
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.35}px Arial Rounded MT Bold, Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('HS', size / 2, size / 2);
+            
+            // 移除阴影
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // 创建下载链接
+            const link = document.createElement('a');
+            link.download = `icon-${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            showSuccessMessage();
+        }
+        
+        function previewIcon(size) {
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>图标预览 - ${size}×${size}</title>
+                    <style>
+                        body {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 100vh;
+                            background: #f1f5f9;
+                            margin: 0;
+                        }
+                        .preview-container {
+                            text-align: center;
+                            padding: 40px;
+                        }
+                        .icon-preview {
+                            width: ${Math.min(400, size)}px;
+                            height: ${Math.min(400, size)}px;
+                            margin: 0 auto 20px;
+                            background: white;
+                            border-radius: 20px;
+                            padding: 20px;
+                            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+                        }
+                        h1 {
+                            color: #1A73E8;
+                            margin-bottom: 20px;
+                        }
+                        .info {
+                            background: #f8fafc;
+                            padding: 15px;
+                            border-radius: 10px;
+                            margin-top: 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="preview-container">
+                        <h1>图标预览 (${size}×${size})</h1>
+                        <div class="icon-preview">
+                            <canvas id="iconCanvas" width="${size}" height="${size}"></canvas>
+                        </div>
+                        <div class="info">
+                            <p>尺寸: ${size}×${size} 像素</p>
+                            <p>格式: PNG (透明背景)</p>
+                            <p>建议文件名: icon-${size}.png</p>
+                        </div>
+                    </div>
+                    <script>
+                        const canvas = document.getElementById('iconCanvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        // 创建渐变背景
+                        const gradient = ctx.createLinearGradient(0, 0, ${size}, ${size});
+                        gradient.addColorStop(0, '#1A73E8');
+                        gradient.addColorStop(1, '#764ba2');
+                        
+                        // 绘制圆角矩形背景
+                        ctx.fillStyle = gradient;
+                        const radius = ${size} * 0.1;
+                        ctx.beginPath();
+                        ctx.moveTo(radius, 0);
+                        ctx.lineTo(${size} - radius, 0);
+                        ctx.quadraticCurveTo(${size}, 0, ${size}, radius);
+                        ctx.lineTo(${size}, ${size} - radius);
+                        ctx.quadraticCurveTo(${size}, ${size}, ${size} - radius, ${size});
+                        ctx.lineTo(radius, ${size});
+                        ctx.quadraticCurveTo(0, ${size}, 0, ${size} - radius);
+                        ctx.lineTo(0, radius);
+                        ctx.quadraticCurveTo(0, 0, radius, 0);
+                        ctx.fill();
+                        
+                        // 添加阴影效果
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+                        ctx.shadowBlur = 10;
+                        ctx.shadowOffsetY = 5;
+                        
+                        // 绘制文字
+                        ctx.fillStyle = 'white';
+                        ctx.font = 'bold ${size * 0.35}px Arial Rounded MT Bold, Arial, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('HS', ${size} / 2, ${size} / 2);
+                    </script>
+                </body>
+                </html>
+            `);
+        }
+        
+        function generateAllIcons() {
+            generateIcon(192);
+            setTimeout(() => {
+                generateIcon(512);
+                setTimeout(() => {
+                    alert('🎉 所有图标已生成完成！\n请检查您的下载文件夹，并将图标文件复制到 mobile-app 文件夹中。\n\n文件名：\n• icon-192.png\n• icon-512.png');
+                }, 500);
+            }, 500);
+        }
+        
+        // 页面加载时显示欢迎信息
+        window.onload = function() {
+            setTimeout(() => {
+                alert('欢迎使用 HouseShare APP图标生成器！\n\n点击按钮即可生成专业的应用图标。\n建议先生成预览，确认效果后再下载。');
+            }, 500);
+        };
+    </script>
+</body>
+</html>

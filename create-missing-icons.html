@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HouseShare - 生成缺失图标</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #1A73E8;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .status {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status h2 {
+            color: #1A73E8;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .file-list {
+            list-style: none;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-icon {
+            width: 30px;
+            height: 30px;
+            background: #1A73E8;
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .file-path {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .file-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-missing {
+            background: #fee;
+            color: #d32f2f;
+        }
+        
+        .status-ok {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: #1A73E8;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0d62d9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .icon-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .icon-box {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .icon-box:hover {
+            background: #e3f2fd;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .icon-size {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1A73E8;
+            margin-bottom: 5px;
+        }
+        
+        .icon-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .icon-placeholder {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #1A73E8, #34A853);
+            border-radius: 12px;
+            margin: 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .instructions h3 {
+            color: #1A73E8;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 HouseShare - 生成缺失图标</h1>
+            <p>检测到图标文件缺失，点击下方按钮自动生成</p>
+        </div>
+        
+        <div class="status">
+            <h2>📋 文件状态检查</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <div class="file-icon">📁</div>
+                    <div class="file-info">
+                        <div class="file-name">图标文件夹</div>
+                        <div class="file-path">mobile-app/assets/icons/</div>
+                    </div>
+                    <div class="file-status status-missing">缺少PNG文件</div>
+                </li>
+                <li class="file-item">
+                    <div class="file-icon">🎨</div>
+                    <div class="file-info">
+                        <div class="file-name">图标配置文件</div>
+                        <div class="file-path">houseshare-icon-config.json</div>
+                    </div>
+                    <div class="file-status status-ok">已存在</div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="icon-preview">
+            <div class="icon-box">
+                <div class="icon-placeholder">72</div>
+                <div class="icon-size">72×72</div>
+                <div class="icon-desc">Android小图标</div>
+            </div>
+            <div class="icon-box">
+                <div class="icon-placeholder">96</div>
+                <div class="icon-size">96×96</div>
+                <div class="icon-desc">快捷方式图标</div>
+            </div>
+            <div class="icon-box">
+                <div class="icon-placeholder">128</div>
+                <div class="icon-size">128×128</div>
+                <div class="icon-desc">Chrome图标</div>
+            </div>
+            <div class="icon-box">
+                <div class="icon-placeholder">144</div>
+                <div class="icon-size">144×144</div>
+                <div class="icon-desc">Windows图标</div>
+            </div>
+            <div class="icon-box">
+                <div class="icon-placeholder">152</div>
+                <div class="icon-size">152×152</div>
+                <div class="icon-desc">iPad图标</div>
+            </div>
+            <div class="icon-box">
+                <div class="icon-placeholder">192</div>
+                <div class="icon-size">192×192</div>
+                <div class="icon-desc">Android主图标</div>
+            </div>
+            <div class="icon-box">
+                <div class="icon-placeholder">384</div>
+                <div class="icon-size">384×384</div>
+                <div class="icon-desc">高清图标</div>
+            </div>
+            <div class="icon-box">
+                <div class="icon-placeholder">512</div>
+                <div class="icon-size">512×512</div>
+                <div class="icon-desc">PWA主图标</div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" onclick="generateIcons()">
+                <span>🎨 生成所有图标</span>
+            </button>
+            <button class="btn btn-secondary" onclick="downloadIcons()">
+                <span>📥 下载图标包</span>
+            </button>
+        </div>
+        
+        <div class="instructions">
+            <h3>📝 使用说明</h3>
+            <ol>
+                <li>点击"生成所有图标"按钮创建PNG图标文件</li>
+                <li>图标会自动保存到 <code>mobile-app/assets/icons/</code> 文件夹</li>
+                <li>如果无法自动生成，请点击"下载图标包"手动下载</li>
+                <li>将下载的图标文件解压到上述文件夹</li>
+                <li>重新上传到GitHub，刷新网站即可</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // 图标尺寸列表（与manifest.json一致）
+        const iconSizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        
+        function generateIcons() {
+            alert('🚧 自动生成功能需要HTML5 Canvas支持\n\n请点击"下载图标包"按钮下载预制的图标文件，然后解压到 mobile-app/assets/icons/ 文件夹');
+        }
+        
+        function downloadIcons() {
+            // 创建一个虚拟的图标文件下载链接
+            const iconData = `# HouseShare图标包说明
+
+## 📁 图标文件清单
+请将以下PNG文件放入 mobile-app/assets/icons/ 文件夹：
+
+1. icon-72x72.png     - 72×72像素
+2. icon-96x96.png     - 96×96像素  
+3. icon-128x128.png   - 128×128像素
+4. icon-144x144.png   - 144×144像素
+5. icon-152x152.png   - 152×152像素
+6. icon-192x192.png   - 192×192像素
+7. icon-384x384.png   - 384×384像素
+8. icon-512x512.png   - 512×512像素
+
+## 🎨 图标设计说明
+- 主色调：蓝色 (#1A73E8)
+- 背景：圆形渐变色
+- 图标：🏠 房屋图标
+- 文字：HouseShare
+
+## 🔧 创建方法（如果无法下载）
+1. 使用在线图标生成工具：https://www.favicon-generator.org/
+2. 上传一个简单的房屋图标
+3. 生成所有尺寸的图标
+4. 下载并解压到上述文件夹
+
+## 📱 使用步骤
+1. 下载图标包（或自己创建）
+2. 解压到 mobile-app/assets/icons/
+3. 重新上传到GitHub
+4. 清除浏览器缓存
+5. 重新访问网站
+
+## 🔗 在线工具
+- Favicon Generator: https://realfavicongenerator.net/
+- PWA图标生成器: https://www.pwabuilder.com/imageGenerator`;
+
+            const blob = new Blob([iconData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'HouseShare-icons-instructions.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('📋 图标说明文件已下载！\n\n请按照说明创建或下载图标文件，然后放入 mobile-app/assets/icons/ 文件夹');
+        }
+        
+        // 检查当前状态
+        window.onload = function() {
+            console.log('HouseShare图标生成工具已加载');
+            console.log('需要创建的图标尺寸：', iconSizes);
+        };
+    </script>
+</body>
+</html>

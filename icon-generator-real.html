@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HouseShare - 真实图标生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #1A73E8;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .icon-preview-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .icon-preview {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .icon-preview h3 {
+            color: #1A73E8;
+            margin-bottom: 15px;
+        }
+        
+        .icon-canvas-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .icon-config {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .icon-config h3 {
+            color: #1A73E8;
+            margin-bottom: 15px;
+        }
+        
+        .config-group {
+            margin-bottom: 20px;
+        }
+        
+        .config-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .config-group input,
+        .config-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .config-group input:focus,
+        .config-group select:focus {
+            outline: none;
+            border-color: #1A73E8;
+        }
+        
+        .color-picker-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .color-option {
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .color-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .color-option.active {
+            border-color: #1A73E8;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: #1A73E8;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0d62d9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #34A853;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #2e9b4a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 168, 83, 0.3);
+        }
+        
+        .btn-tertiary {
+            background: #FBBC04;
+            color: #333;
+        }
+        
+        .btn-tertiary:hover {
+            background: #f2b500;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(251, 188, 4, 0.3);
+        }
+        
+        .icon-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .icon-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .icon-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .icon-size {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1A73E8;
+            margin-bottom: 5px;
+        }
+        
+        .icon-status {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .instructions h3 {
+            color: #1A73E8;
+            margin-bottom: 10px;
+        }
+        
+        .instructions code {
+            background: rgba(26, 115, 232, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .progress-container {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1A73E8, #34A853);
+            width: 0%;
+            transition: width 0.3s;
+            border-radius: 10px;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+        
+        .status-error {
+            background: #ffebee;
+            color: #d32f2f;
+            border-left: 4px solid #d32f2f;
+        }
+        
+        .status-info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left: 4px solid #1976d2;
+        }
+        
+        .download-link {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 16px;
+            background: #1A73E8;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .download-link:hover {
+            background: #0d62d9;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 HouseShare - 真实图标生成器</h1>
+            <p>使用HTML5 Canvas生成真实的PNG图标文件，解决404错误</p>
+        </div>
+        
+        <div class="icon-preview-container">
+            <div class="icon-preview">
+                <h3>📱 图标预览</h3>
+                <div class="icon-canvas-container">
+                    <canvas id="iconCanvas" width="192" height="192"></canvas>
+                </div>
+                <div id="iconInfo">
+                    <div class="icon-size">192×192 像素</div>
+                    <div class="icon-status">点击下方按钮生成所有尺寸</div>
+                </div>
+            </div>
+            
+            <div class="icon-config">
+                <h3>🎨 图标设置</h3>
+                
+                <div class="config-group">
+                    <label for="iconText">图标文字</label>
+                    <input type="text" id="iconText" value="HS" maxlength="2">
+                </div>
+                
+                <div class="config-group">
+                    <label>背景颜色</label>
+                    <div class="color-picker-group">
+                        <div class="color-option active" data-color="#1A73E8" style="background: #1A73E8; color: white;">蓝色</div>
+                        <div class="color-option" data-color="#34A853" style="background: #34A853; color: white;">绿色</div>
+                        <div class="color-option" data-color="#FBBC04" style="background: #FBBC04; color: #333;">黄色</div>
+                        <div class="color-option" data-color="#EA4335" style="background: #EA4335; color: white;">红色</div>
+                        <div class="color-option" data-color="#4285F4" style="background: #4285F4; color: white;">亮蓝</div>
+                        <div class="color-option" data-color="#8E44AD" style="background: #8E44AD; color: white;">紫色</div>
+                    </div>
+                </div>
+                
+                <div class="config-group">
+                    <label>图标样式</label>
+                    <select id="iconStyle">
+                        <option value="circle">圆形</option>
+                        <option value="rounded">圆角方形</option>
+                        <option value="square">方形</option>
+                    </select>
+                </div>
+                
+                <div class="config-group">
+                    <label>文字颜色</label>
+                    <select id="textColor">
+                        <option value="white">白色</option>
+                        <option value="black">黑色</option>
+                        <option value="light">浅色</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="icon-list">
+            <div class="icon-item" data-size="72">
+                <div class="icon-size">72×72</div>
+                <div class="icon-status" id="status-72">等待生成</div>
+            </div>
+            <div class="icon-item" data-size="96">
+                <div class="icon-size">96×96</div>
+                <div class="icon-status" id="status-96">等待生成</div>
+            </div>
+            <div class="icon-item" data-size="128">
+                <div class="icon-size">128×128</div>
+                <div class="icon-status" id="status-128">等待生成</div>
+            </div>
+            <div class="icon-item" data-size="144">
+                <div class="icon-size">144×144</div>
+                <div class="icon-status" id="status-144">等待生成</div>
+            </div>
+            <div class="icon-item" data-size="152">
+                <div class="icon-size">152×152</div>
+                <div class="icon-status" id="status-152">等待生成</div>
+            </div>
+            <div class="icon-item" data-size="192">
+                <div class="icon-size">192×192</div>
+                <div class="icon-status" id="status-192">等待生成</div>
+            </div>
+            <div class="icon-item" data-size="384">
+                <div class="icon-size">384×384</div>
+                <div class="icon-status" id="status-384">等待生成</div>
+            </div>
+            <div class="icon-item" data-size="512">
+                <div class="icon-size">512×512</div>
+                <div class="icon-status" id="status-512">等待生成</div>
+            </div>
+        </div>
+        
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="status-message" id="statusMessage"></div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" onclick="generateAllIcons()">
+                <span>🎨 生成所有图标</span>
+            </button>
+            <button class="btn btn-secondary" onclick="downloadAllIcons()">
+                <span>📥 下载图标包</span>
+            </button>
+            <button class="btn btn-tertiary" onclick="testIcons()">
+                <span>🔧 测试图标</span>
+            </button>
+        </div>
+        
+        <div class="instructions">
+            <h3>📝 使用说明</h3>
+            <p><strong>第一步：</strong> 自定义图标文字和颜色（建议使用"HS"代表HouseShare）</p>
+            <p><strong>第二步：</strong> 点击"生成所有图标"按钮创建8个PNG图标文件</p>
+            <p><strong>第三步：</strong> 点击"下载图标包"下载所有生成的图标</p>
+            <p><strong>第四步：</strong> 将下载的图标文件解压到：<code>mobile-app/assets/icons/</code> 文件夹</p>
+            <p><strong>第五步：</strong> 重新上传到GitHub，刷新网站即可</p>
+        </div>
+    </div>
+
+    <script>
+        // 图标尺寸列表（与manifest.json一致）
+        const iconSizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        let generatedIcons = {};
+        
+        // 初始化Canvas
+        const canvas = document.getElementById('iconCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 颜色选项
+        const colorOptions = document.querySelectorAll('.color-option');
+        colorOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                colorOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                updatePreview();
+            });
+        });
+        
+        // 监听输入变化
+        document.getElementById('iconText').addEventListener('input', updatePreview);
+        document.getElementById('iconStyle').addEventListener('change', updatePreview);
+        document.getElementById('textColor').addEventListener('change', updatePreview);
+        
+        // 更新预览
+        function updatePreview() {
+            const size = 192;
+            const text = document.getElementById('iconText').value || 'HS';
+            const color = document.querySelector('.color-option.active').dataset.color;
+            const style = document.getElementById('iconStyle').value;
+            const textColor = document.getElementById('textColor').value;
+            
+            drawIcon(ctx, size, size, text, color, style, textColor);
+        }
+        
+        // 绘制图标
+        function drawIcon(ctx, width, height, text, bgColor, style, textColorOption) {
+            ctx.clearRect(0, 0, width, height);
+            
+            // 计算文字颜色
+            let textColor = '#FFFFFF';
+            if (textColorOption === 'black') textColor = '#000000';
+            else if (textColorOption === 'light') textColor = '#F0F0F0';
+            
+            // 绘制背景
+            ctx.fillStyle = bgColor;
+            
+            if (style === 'circle') {
+                ctx.beginPath();
+                ctx.arc(width/2, height/2, Math.min(width, height)/2, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (style === 'rounded') {
+                const radius = Math.min(width, height) * 0.2;
+                ctx.beginPath();
+                ctx.roundRect(0, 0, width, height, radius);
+                ctx.fill();
+            } else {
+                ctx.fillRect(0, 0, width, height);
+            }
+            
+            // 绘制文字
+            ctx.fillStyle = textColor;
+            ctx.font = `bold ${Math.min(width, height) * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, width/2, height/2);
+            
+            // 添加边框
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+            if (style === 'circle') {
+                ctx.beginPath();
+                ctx.arc(width/2, height/2, Math.min(width, height)/2 - 1, 0, Math.PI * 2);
+                ctx.stroke();
+            } else if (style === 'rounded') {
+                const radius = Math.min(width, height) * 0.2;
+                ctx.beginPath();
+                ctx.roundRect(1, 1, width-2, height-2, radius);
+                ctx.stroke();
+            } else {
+                ctx.strokeRect(1, 1, width-2, height-2);
+            }
+        }
+        
+        // 生成单个图标
+        function generateIcon(size) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                
+                const text = document.getElementById('iconText').value || 'HS';
+                const color = document.querySelector('.color-option.active').dataset.color;
+                const style = document.getElementById('iconStyle').value;
+                const textColor = document.getElementById('textColor').value;
+                
+                drawIcon(ctx, size, size, text, color, style, textColor);
+                
+                // 将Canvas转换为Data URL
+                const dataUrl = canvas.toDataURL('image/png');
+                generatedIcons[size] = dataUrl;
+                
+                // 更新状态
+                const statusElement = document.getElementById(`status-${size}`);
+                statusElement.textContent = '已生成';
+                statusElement.style.color = '#34A853';
+                statusElement.style.fontWeight = 'bold';
+                
+                resolve(dataUrl);
+            });
+        }
+        
+        // 生成所有图标
+        async function generateAllIcons() {
+            showStatus('正在生成图标...', 'info');
+            showProgress();
+            
+            generatedIcons = {};
+            let completed = 0;
+            
+            for (const size of iconSizes) {
+                await generateIcon(size);
+                completed++;
+                updateProgress(completed / iconSizes.length * 100);
+            }
+            
+            updateProgress(100);
+            showStatus('✅ 所有图标生成完成！', 'success');
+            
+            // 创建下载链接
+            createDownloadLinks();
+        }
+        
+        // 创建下载链接
+        function createDownloadLinks() {
+            const statusElement = document.getElementById('statusMessage');
+            let html = '<h4>📥 单个图标下载：</h4>';
+            
+            iconSizes.forEach(size => {
+                if (generatedIcons[size]) {
+                    const filename = `icon-${size}x${size}.png`;
+                    html += `<a href="${generatedIcons[size]}" download="${filename}" class="download-link">${filename}</a>`;
+                }
+            });
+            
+            statusElement.innerHTML += html;
+            statusElement.style.display = 'block';
+        }
+        
+        // 下载所有图标
+        function downloadAllIcons() {
+            if (Object.keys(generatedIcons).length === 0) {
+                showStatus('❌ 请先生成图标！', 'error');
+                return;
+            }
+            
+            showStatus('正在创建图标包...', 'info');
+            
+            // 创建ZIP文件（使用JSZip库的替代方案）
+            try {
+                // 创建包含所有图标的页面
+                const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HouseShare图标包</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .icon { margin: 10px; display: inline-block; text-align: center; }
+        .download-link { display: block; margin: 10px; padding: 10px; background: #1A73E8; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>HouseShare图标包</h1>
+    <p>请右键点击每个图标，选择"图片另存为"保存到：<strong>mobile-app/assets/icons/</strong> 文件夹</p>
+    <div id="icons-container"></div>
+    <script>
+        const icons = ${JSON.stringify(generatedIcons)};
+        const sizes = ${JSON.stringify(iconSizes)};
+        
+        const container = document.getElementById('icons-container');
+        sizes.forEach(size => {
+            if (icons[size]) {
+                const div = document.createElement('div');
+                div.className = 'icon';
+                div.innerHTML = \`
+                    <img src="\${icons[size]}" alt="icon-\${size}x\${size}">
+                    <div>icon-\${size}x\${size}.png</div>
+                    <a href="\${icons[size]}" download="icon-\${size}x\${size}.png" class="download-link">下载</a>
+                \`;
+                container.appendChild(div);
+            }
+        });
+    <\/script>
+</body>
+</html>`;
+                
+                // 创建下载链接
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'HouseShare-icons-download.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showStatus('✅ 图标包已创建！打开下载的HTML文件保存所有图标', 'success');
+            } catch (error) {
+                showStatus('❌ 创建图标包失败：' + error.message, 'error');
+            }
+        }
+        
+        // 测试图标
+        function testIcons() {
+            if (Object.keys(generatedIcons).length === 0) {
+                showStatus('❌ 请先生成图标！', 'error');
+                return;
+            }
+            
+            showStatus('🔧 测试中...检查manifest.json配置', 'info');
+            
+            // 检查manifest.json配置
+            const manifestIcons = [
+                { src: "assets/icons/icon-72x72.png", sizes: "72x72" },
+                { src: "assets/icons/icon-96x96.png", sizes: "96x96" },
+                { src: "assets/icons/icon-128x128.png", sizes: "128x128" },
+                { src: "assets/icons/icon-144x144.png", sizes: "144x144" },
+                { src: "assets/icons/icon-152x152.png", sizes: "152x152" },
+                { src: "assets/icons/icon-192x192.png", sizes: "192x192" },
+                { src: "assets/icons/icon-384x384.png", sizes: "384x384" },
+                { src: "assets/icons/icon-512x512.png", sizes: "512x512" }
+            ];
+            
+            let testHtml = '<h4>🔧 图标测试结果：</h4>';
+            testHtml += '<p>请将生成的图标文件放入以下路径：</p>';
+            testHtml += '<code>mobile-app/assets/icons/</code>';
+            testHtml += '<p>文件清单：</p><ul>';
+            
+            iconSizes.forEach(size => {
+                testHtml += `<li><strong>icon-${size}x${size}.png</strong> - ${size}×${size}像素</li>`;
+            });
+            
+            testHtml += '</ul>';
+            testHtml += '<p>确保manifest.json中的路径正确：</p>';
+            testHtml += '<pre><code>' + JSON.stringify(manifestIcons, null, 2) + '</code></pre>';
+            
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.innerHTML = testHtml;
+            statusElement.className = 'status-message status-info';
+            statusElement.style.display = 'block';
+        }
+        
+        // 显示进度条
+        function showProgress() {
+            const container = document.getElementById('progressContainer');
+            container.style.display = 'block';
+            updateProgress(0);
+        }
+        
+        // 更新进度
+        function updateProgress(percent) {
+            const bar = document.getElementById('progressBar');
+            bar.style.width = percent + '%';
+        }
+        
+        // 显示状态消息
+        function showStatus(message, type) {
+            const element = document.getElementById('statusMessage');
+            element.textContent = message;
+            element.className = `status-message status-${type}`;
+            element.style.display = 'block';
+        }
+        
+        // 初始化
+        window.onload = function() {
+            updatePreview();
+            console.log('HouseShare真实图标生成器已加载');
+        };
+        
+        // 添加roundRect支持（如果浏览器不支持）
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+                if (width < 2 * radius) radius = width / 2;
+                if (height < 2 * radius) radius = height / 2;
+                this.beginPath();
+                this.moveTo(x + radius, y);
+                this.arcTo(x + width, y, x + width, y + height, radius);
+                this.arcTo(x + width, y + height, x, y + height, radius);
+                this.arcTo(x, y + height, x, y, radius);
+                this.arcTo(x, y, x + width, y, radius);
+                this.closePath();
+                return this;
+            }
+        }
+    </script>
+</body>
+</html>
