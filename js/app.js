@@ -842,7 +842,8 @@ class HouseShareApp {
     // 初始化首页组件
     initHomeComponents() {
         console.log('初始化首页组件...');
-        // 绑定按钮事件
+        
+        // 使用 addEventListener 绑定事件，确保兼容性
         const addPropertyBtn = document.getElementById('addPropertyBtn');
         const viewPropertiesBtn = document.getElementById('viewPropertiesBtn');
         const addClientBtn = document.getElementById('addClientBtn');
@@ -851,53 +852,77 @@ class HouseShareApp {
         console.log('首页按钮元素:', {addPropertyBtn, viewPropertiesBtn, addClientBtn, publishBtn});
         
         if (addPropertyBtn) {
-            addPropertyBtn.onclick = () => {
+            addPropertyBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 console.log('点击新增房源按钮');
                 this.loadPage('properties');
-            };
+            });
         }
         
         if (viewPropertiesBtn) {
-            viewPropertiesBtn.onclick = () => {
+            viewPropertiesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 console.log('点击查看房源按钮');
                 this.loadPage('properties');
-            };
+            });
         }
         
         if (addClientBtn) {
-            addClientBtn.onclick = () => {
+            addClientBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 console.log('点击新增客户按钮');
                 this.loadPage('clients');
-            };
+            });
         }
         
         if (publishBtn) {
-            publishBtn.onclick = () => {
+            publishBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 console.log('点击发布按钮');
                 this.loadPage('publish');
-            };
+            });
         }
     }
 
     // 初始化房源页面组件
     initPropertiesComponents() {
+        console.log('初始化房源页面组件...');
+        
         // 绑定新增房源按钮
         const addNewPropertyBtn = document.getElementById('addNewPropertyBtn');
+        console.log('新增房源按钮元素:', addNewPropertyBtn);
+        
         if (addNewPropertyBtn) {
-            addNewPropertyBtn.onclick = () => this.showAddPropertyModal();
+            addNewPropertyBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('点击新增房源按钮 (房源页)');
+                this.showAddPropertyModal();
+            });
         }
         
         // 绑定筛选按钮
         const filterPropertiesBtn = document.getElementById('filterPropertiesBtn');
         if (filterPropertiesBtn) {
-            filterPropertiesBtn.onclick = () => this.showFilterModal();
+            filterPropertiesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('点击筛选按钮');
+                this.showFilterModal();
+            });
         }
     }
     
     // 显示新增房源弹窗
     showAddPropertyModal() {
+        console.log('showAddPropertyModal 被调用');
+        
+        // 移除已存在的弹窗
+        const existingModal = document.getElementById('addPropertyModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
         const modal = document.createElement('div');
-        modal.className = 'modal';
+        modal.className = 'modal-overlay active';
         modal.id = 'addPropertyModal';
         modal.innerHTML = `
             <div class="modal-content">
@@ -938,6 +963,13 @@ class HouseShareApp {
         `;
         document.body.appendChild(modal);
         
+        // 点击遮罩关闭弹窗
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeModal('addPropertyModal');
+            }
+        });
+        
         // 绑定表单提交
         document.getElementById('addPropertyForm').onsubmit = (e) => {
             e.preventDefault();
@@ -969,9 +1001,11 @@ class HouseShareApp {
     
     // 关闭弹窗
     closeModal(modalId) {
+        console.log('关闭弹窗:', modalId);
         const modal = document.getElementById(modalId);
         if (modal) {
-            modal.remove();
+            modal.classList.remove('active');
+            setTimeout(() => modal.remove(), 300);
         }
     }
 
