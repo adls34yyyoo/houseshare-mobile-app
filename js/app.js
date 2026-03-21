@@ -10,10 +10,14 @@ class HouseShareApp {
     // 初始化应用
     async init() {
         try {
-            // 注册 Service Worker
+            // 注册 Service Worker (使用相对路径适配GitHub Pages)
             if ('serviceWorker' in navigator) {
-                await navigator.serviceWorker.register('/sw.js');
-                console.log('Service Worker 注册成功');
+                try {
+                    await navigator.serviceWorker.register('./sw.js');
+                    console.log('Service Worker 注册成功');
+                } catch (e) {
+                    console.warn('Service Worker 注册失败，将以离线模式运行:', e);
+                }
             }
 
             // 初始化UI
