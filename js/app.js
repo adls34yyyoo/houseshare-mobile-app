@@ -17,6 +17,7 @@ class HouseShareApp {
         // 页面历史管理
         this.pageHistory = ['home']; // 页面历史栈
         this.isHandlingPopState = false; // 是否正在处理popstate事件
+        this.currentModal = null; // 当前打开的弹窗ID
         this.init();
     }
 
@@ -65,6 +66,16 @@ class HouseShareApp {
             console.log('popstate 事件触发', e.state);
             if (this.isHandlingPopState) return;
             this.isHandlingPopState = true;
+
+            // 如果有弹窗打开，关闭弹窗而不是返回页面
+            if (this.currentModal) {
+                console.log('关闭弹窗:', this.currentModal);
+                this.closeModal(this.currentModal);
+                setTimeout(() => {
+                    this.isHandlingPopState = false;
+                }, 100);
+                return;
+            }
 
             if (this.pageHistory.length > 1) {
                 // 弹出当前页面
@@ -345,6 +356,25 @@ class HouseShareApp {
                         <h1>欢迎回来</h1>
                         <p>随时随地管理您的房源业务</p>
                     </div>
+                </div>
+
+                <div class="quick-actions">
+                    <a href="#" class="quick-action" id="addSalePropertyBtn">
+                        <i class="ri-home-line"></i>
+                        <span>新增卖房</span>
+                    </a>
+                    <a href="#" class="quick-action" id="addRentPropertyBtn">
+                        <i class="ri-home-line"></i>
+                        <span>新增租房</span>
+                    </a>
+                    <a href="#" class="quick-action" id="viewPropertiesBtn">
+                        <i class="ri-home-line"></i>
+                        <span>房源管理</span>
+                    </a>
+                    <a href="#" class="quick-action" id="publishBtn">
+                        <i class="ri-share-line"></i>
+                        <span>一键发布</span>
+                    </a>
                 </div>
 
                 <div class="stats-cards">
@@ -785,6 +815,15 @@ class HouseShareApp {
 
                 <div class="menu-section">
                     <div class="menu-title">数据管理</div>
+                    <a href="#" class="menu-item" onclick="app.showAddCommunityModal()">
+                        <div class="menu-item-left">
+                            <div class="menu-item-icon">
+                                <i class="ri-community-line"></i>
+                            </div>
+                            <div class="menu-item-text">小区维护</div>
+                        </div>
+                    </a>
+
                     <a href="#" class="menu-item" onclick="app.exportData()">
                         <div class="menu-item-left">
                             <div class="menu-item-icon">
@@ -793,7 +832,7 @@ class HouseShareApp {
                             <div class="menu-item-text">导出数据</div>
                         </div>
                     </a>
-                    
+
                     <a href="#" class="menu-item" onclick="app.backupData()">
                         <div class="menu-item-left">
                             <div class="menu-item-icon">
@@ -1626,16 +1665,19 @@ class HouseShareApp {
     // 显示新增房源弹窗
     showAddPropertyModal(listingType = 'sale') {
         console.log('showAddPropertyModal 被调用, listingType:', listingType);
-        
+
+        // 记录当前打开的弹窗
+        this.currentModal = 'addPropertyModal';
+
         // 设置标题
         const title = listingType === 'rent' ? '新增租房' : '新增卖房';
-        
+
         // 移除已存在的弹窗
         const existingModal = document.getElementById('addPropertyModal');
         if (existingModal) {
             existingModal.remove();
         }
-        
+
         const modal = document.createElement('div');
         modal.className = 'modal-overlay active';
         modal.id = 'addPropertyModal';
@@ -3041,6 +3083,10 @@ class HouseShareApp {
         if (modal) {
             modal.classList.remove('active');
             setTimeout(() => modal.remove(), 300);
+        }
+        // 如果关闭的是当前记录的弹窗，清除记录
+        if (this.currentModal === modalId) {
+            this.currentModal = null;
         }
     }
 
