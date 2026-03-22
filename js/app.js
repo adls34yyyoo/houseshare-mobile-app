@@ -2110,7 +2110,7 @@ class HouseShareApp {
                             </div>
                             <div class="form-group">
                                 <label>面积 (㎡) *</label>
-                                <input type="number" id="propertyArea" required placeholder="㎡">
+                                <input type="number" id="propertyArea" required placeholder="㎡" step="0.01" min="0">
                             </div>
                         </div>
                         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -2285,7 +2285,7 @@ class HouseShareApp {
         const property = {
             id: Date.now(),
             title: title,
-            location: location,
+            location: title, // 使用小区名称作为位置
             listingType: listingType,
             price: price,
             area: parseFloat(document.getElementById('propertyArea').value) || 0,
@@ -2321,17 +2321,19 @@ class HouseShareApp {
         const input = document.getElementById(inputId);
         const voiceStatus = document.getElementById('voiceStatus');
         
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        // 检查浏览器是否支持语音识别
+        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognitionAPI) {
             this.showError('您的浏览器不支持语音识别功能，请使用Chrome浏览器');
             return;
         }
         
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         
         recognition.continuous = false;
         recognition.interimResults = false;
         recognition.lang = 'zh-CN';
+        recognition.maxAlternatives = 1;
         
         // 显示聆听状态
         if (voiceStatus) {
@@ -2381,7 +2383,15 @@ class HouseShareApp {
             if (event.error === 'no-speech') {
                 errorMsg = '未检测到语音，请再说一次';
             } else if (event.error === 'not-allowed') {
-                errorMsg = '请允许麦克风权限';
+                errorMsg = '请允许麦克风权限：点击浏览器地址栏左侧的锁定图标，允许使用麦克风';
+            } else if (event.error === 'network') {
+                errorMsg = '网络错误，请检查网络连接';
+            } else if (event.error === 'aborted') {
+                errorMsg = '语音识别已取消';
+            } else if (event.error === 'audio-capture') {
+                errorMsg = '无法访问麦克风，请检查设备';
+            } else if (event.error === 'service-not-allowed') {
+                errorMsg = '语音识别服务不可用';
             }
             this.showError(errorMsg);
         };
@@ -2401,9 +2411,16 @@ class HouseShareApp {
 
         // 默认小区列表
         const defaultCommunities = ['市中心豪华公寓', '花园别墅', '江景豪宅', '华盈小区', '绿城路小区', '文源小区', '拱极小区', '梅花小区', '西门小区'];
+        
+        // 合并用户已添加的小区列表到搜索列表（优先匹配用户添加的小区）
+        const userCommunities = (this.communities || []).map(c => c.name);
+        const allCommunities = [...userCommunities, ...defaultCommunities];
+        
+        // 去重
+        const uniqueCommunities = [...new Set(allCommunities)];
 
-        // 1. 小区名匹配
-        for (const name of defaultCommunities) {
+        // 1. 小区名匹配 - 优先匹配用户已添加的小区
+        for (const name of uniqueCommunities) {
             if (text.includes(name)) {
                 result.title = name;
                 break;
@@ -2477,12 +2494,31 @@ class HouseShareApp {
             else result.decoration = '精装';
         }
 
-        // 8. 电话
-        const phoneMatch = text.match(/1[3-9]\d{9}/);
-        if (phoneMatch) result.ownerPhone = phoneMatch[0];
+        // 8. 电话 - 增强解析，支持多种格式
+        // 匹配：13812345678、138-1234-5678、138 1234 5678、+8613812345678、86-138-1234-5678
+        const phoneMatch = text.match(/(?:\+86|86)?[- ]?1[3-9]\d[- ]?\d{4}[- ]?\d{4}/);
+        if (phoneMatch) {
+            // 清理电话号码，去除空格和-
+            result.ownerPhone = phoneMatch[0].replace(/[- ]/g, '').replace(/^\+86/, '');
+        }
 
-        // 9. 房东姓名
-        const ownerMatch = text.match(/房东[：:\s]*([^\s\d，,。.]{2,4})/);
+        // 9. 房东姓名 - 增强解析，支持多种格式
+        // 格式：房东张三、房东：李四、业主王先生、联系人张女士、姓李、名张三
+        let ownerMatch = text.match(/房东[：:\s]*([^\s\d，,。.]{2,4})/);
+        if (!ownerMatch) ownerMatch = text.match(/业主[：:\s]*([^\s\d，,。.]{2,4})/);
+        if (!ownerMatch) ownerMatch = text.match(/联系人[：:\s]*([^\s\d，,。.]{2,4})/);
+        // 匹配单独的中文姓名（2-4个汉字，前面没有特定关键词时）
+        if (!ownerMatch) {
+            const namePattern = text.match(/(?:姓[名]?|名叫?|叫)[：:\s]*([^\s\d，,。.]{2,4})/);
+            if (namePattern) ownerMatch = [null, namePattern[1]];
+        }
+        // 匹配"张先生"、"李女士"格式
+        if (!ownerMatch) {
+            const nameWithTitle = text.match(/([李王张刘陈杨黄赵周吴徐孙马朱胡郭何高林罗郑梁谢宋唐许韩冯邓曹彭曾肖田董袁潘于蒋蔡余杜叶程魏苏吕丁任沈姚卢姜崔钟谭陆汪范金石]先生|女士|小姐|太太)/);
+            if (nameWithTitle) {
+                ownerMatch = [null, nameWithTitle[1]];
+            }
+        }
         if (ownerMatch) result.ownerName = ownerMatch[1];
 
         console.log('smartParseText 解析结果:', result);
@@ -2493,17 +2529,19 @@ class HouseShareApp {
     startSmartVoiceInput() {
         const voiceStatus = document.getElementById('voiceStatus');
         
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        // 检查浏览器是否支持语音识别
+        const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognitionAPI) {
             this.showError('您的浏览器不支持语音识别功能，请使用Chrome浏览器');
             return;
         }
         
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         
         recognition.continuous = false;
         recognition.interimResults = true;
         recognition.lang = 'zh-CN';
+        recognition.maxAlternatives = 1;
         
         // 显示聆听状态
         if (voiceStatus) {
@@ -2535,9 +2573,13 @@ class HouseShareApp {
                 
                 // 自动填入表单
                 if (parsed.title) document.getElementById('propertyTitle').value = parsed.title;
-                if (parsed.title) document.getElementById('propertyLocation').value = parsed.title;
                 if (parsed.area) document.getElementById('propertyArea').value = parsed.area;
                 if (parsed.price) document.getElementById('propertyPrice').value = parsed.price;
+                if (parsed.layout) document.getElementById('propertyLayout').value = parsed.layout;
+                if (parsed.floor) document.getElementById('propertyFloor').value = parsed.floor;
+                if (parsed.decoration) document.getElementById('propertyDecoration').value = parsed.decoration;
+                if (parsed.ownerPhone) document.getElementById('propertyOwnerPhone').value = parsed.ownerPhone;
+                if (parsed.ownerName) document.getElementById('propertyOwnerName').value = parsed.ownerName;
                 
                 // 显示识别结果
                 const parts = [];
@@ -2545,6 +2587,10 @@ class HouseShareApp {
                 if (parsed.price != null) parts.push(`价格：${parsed.price}${parsed.listingType === 'rent' ? '元/月' : '万'}`);
                 if (parsed.area != null) parts.push(`面积：${parsed.area}㎡`);
                 if (parsed.layout) parts.push(`户型：${parsed.layout}`);
+                if (parsed.floor) parts.push(`楼层：${parsed.floor}`);
+                if (parsed.decoration) parts.push(`装修：${parsed.decoration}`);
+                if (parsed.ownerName) parts.push(`房东：${parsed.ownerName}`);
+                if (parsed.ownerPhone) parts.push(`电话：${parsed.ownerPhone}`);
                 
                 if (voiceStatus) {
                     voiceStatus.querySelector('span').textContent = `已识别：${parts.join(' / ')}`;
@@ -2559,8 +2605,19 @@ class HouseShareApp {
             if (voiceStatus) voiceStatus.style.display = 'none';
             
             let errorMsg = '语音识别失败';
-            if (event.error === 'no-speech') errorMsg = '未检测到语音，请再说一次';
-            else if (event.error === 'not-allowed') errorMsg = '请允许麦克风权限';
+            if (event.error === 'no-speech') {
+                errorMsg = '未检测到语音，请再说一次';
+            } else if (event.error === 'not-allowed') {
+                errorMsg = '请允许麦克风权限：点击浏览器地址栏左侧的锁定图标，允许使用麦克风';
+            } else if (event.error === 'network') {
+                errorMsg = '网络错误，请检查网络连接';
+            } else if (event.error === 'aborted') {
+                errorMsg = '语音识别已取消';
+            } else if (event.error === 'audio-capture') {
+                errorMsg = '无法访问麦克风，请检查设备';
+            } else if (event.error === 'service-not-allowed') {
+                errorMsg = '语音识别服务不可用';
+            }
             this.showError(errorMsg);
         };
         
@@ -2626,6 +2683,14 @@ class HouseShareApp {
             const decoEl = document.getElementById('propertyDecoration');
             if (decoEl) decoEl.value = parsed.decoration;
         }
+        if (parsed.ownerName) {
+            const ownerNameEl = document.getElementById('propertyOwnerName');
+            if (ownerNameEl) ownerNameEl.value = parsed.ownerName;
+        }
+        if (parsed.ownerPhone) {
+            const ownerPhoneEl = document.getElementById('propertyOwnerPhone');
+            if (ownerPhoneEl) ownerPhoneEl.value = parsed.ownerPhone;
+        }
 
         // 显示识别结果
         const parts = [];
@@ -2635,6 +2700,8 @@ class HouseShareApp {
         if (parsed.layout) parts.push(`户型：${parsed.layout}`);
         if (parsed.floor) parts.push(`楼层：${parsed.floor}`);
         if (parsed.decoration) parts.push(`装修：${parsed.decoration}`);
+        if (parsed.ownerName) parts.push(`房东：${parsed.ownerName}`);
+        if (parsed.ownerPhone) parts.push(`电话：${parsed.ownerPhone}`);
 
         this.showMessage(`已识别 ${parts.length} 项：${parts.slice(0,3).join(' / ')}${parts.length > 3 ? '...' : ''}`, 'success');
 
@@ -2926,7 +2993,7 @@ class HouseShareApp {
                             </div>
                             <div class="form-group">
                                 <label>面积 (㎡) *</label>
-                                <input type="number" id="editPropertyArea" required value="${property.area || ''}" placeholder="㎡">
+                                <input type="number" id="editPropertyArea" required value="${property.area || ''}" placeholder="㎡" step="0.01" min="0">
                             </div>
                         </div>
                         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
