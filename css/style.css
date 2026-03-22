@@ -387,6 +387,17 @@ body {
     justify-content: center;
 }
 
+/* 语音输入状态 */
+.voice-status {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
 /* 表单样式 */
 .form-group {
     margin-bottom: var(--space-lg);
@@ -421,6 +432,108 @@ body {
 
 .form-control::placeholder {
     color: var(--text-disabled);
+}
+
+/* 搜索框样式 */
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: 0 var(--space-md);
+}
+
+.search-box i {
+    color: var(--text-disabled);
+    font-size: 18px;
+}
+
+.search-box input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: var(--space-md);
+    font-size: var(--text-base);
+    color: var(--text-primary);
+    outline: none;
+    min-height: 48px;
+}
+
+.search-box input::placeholder {
+    color: var(--text-disabled);
+}
+
+.search-box .clear-search {
+    color: var(--text-disabled);
+    font-size: 18px;
+    padding: 8px;
+}
+
+.search-box .clear-search:hover {
+    color: var(--text-secondary);
+}
+
+/* 代理来源方标签样式 */
+.agency-source-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.agency-tab {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-medium);
+    border-radius: 20px;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.agency-tab:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.agency-tab.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.agency-tab .tab-count {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.agency-tab.active .tab-count {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.agency-tab.add-source {
+    border-style: dashed;
+    color: var(--primary);
+}
+
+.agency-tab.add-source:hover {
+    background: var(--primary-light);
+}
+
+/* 代理房源状态 */
+.property-status.status-agency {
+    background: #9C27B0;
+    color: white;
 }
 
 /* 列表样式 */
