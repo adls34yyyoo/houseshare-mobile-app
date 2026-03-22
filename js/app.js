@@ -14,6 +14,9 @@ class HouseShareApp {
         this.customLayouts = []; // 自定义户型
         this.customDecorations = []; // 自定义装修
         this.customFloors = []; // 自定义楼层
+        // 页面历史管理
+        this.pageHistory = ['home']; // 页面历史栈
+        this.isHandlingPopState = false; // 是否正在处理popstate事件
         this.init();
     }
 
@@ -56,6 +59,36 @@ class HouseShareApp {
         // 更新当前时间
         this.updateTime();
         setInterval(() => this.updateTime(), 60000);
+
+        // 监听浏览器返回键
+        window.addEventListener('popstate', (e) => {
+            console.log('popstate 事件触发', e.state);
+            if (this.isHandlingPopState) return;
+            this.isHandlingPopState = true;
+
+            if (this.pageHistory.length > 1) {
+                // 弹出当前页面
+                this.pageHistory.pop();
+                // 获取前一个页面
+                const prevPage = this.pageHistory[this.pageHistory.length - 1];
+                console.log('返回到上一个页面:', prevPage);
+                this.loadPage(prevPage, false); // false 表示不添加历史记录
+            } else {
+                // 已经是第一个页面，不做操作
+                console.log('已经是第一个页面');
+            }
+
+            setTimeout(() => {
+                this.isHandlingPopState = false;
+            }, 100);
+        });
+
+        // 检查 URL hash，如果存在则加载对应页面
+        const hash = window.location.hash.slice(1);
+        const validPages = ['home', 'properties', 'agency', 'clients', 'publish', 'profile'];
+        if (hash && validPages.includes(hash)) {
+            this.initialPage = hash;
+        }
 
         // 检查用户是否已登录
         if (!this.checkLogin()) {
@@ -242,13 +275,24 @@ class HouseShareApp {
     }
 
     // 加载页面
-    async loadPage(pageName) {
-        console.log('loadPage 被调用:', pageName);
+    async loadPage(pageName, addToHistory = true) {
+        console.log('loadPage 被调用:', pageName, 'addToHistory:', addToHistory);
         try {
             this.showLoading();
-            
+
+            // 添加到历史记录
+            if (addToHistory) {
+                const currentPage = this.pageHistory[this.pageHistory.length - 1];
+                if (currentPage !== pageName) {
+                    this.pageHistory.push(pageName);
+                    // 使用 history.pushState 添加浏览器历史
+                    history.pushState({ page: pageName }, '', '#' + pageName);
+                    console.log('添加页面到历史:', pageName, '历史栈:', this.pageHistory);
+                }
+            }
+
             let pageContent = '';
-            
+
             switch (pageName) {
                 case 'home':
                     pageContent = this.getHomePage();
@@ -271,18 +315,18 @@ class HouseShareApp {
                 default:
                     pageContent = this.getHomePage();
             }
-            
+
             const pageElement = document.getElementById('pageContent');
             if (pageElement) {
                 pageElement.innerHTML = pageContent;
             }
-            
+
             // 更新导航状态
             this.updateNavigation(pageName);
-            
+
             // 初始化页面组件
             this.initPageComponents(pageName);
-            
+
         } catch (error) {
             console.error('加载页面失败:', error);
             this.showError('页面加载失败');
@@ -301,29 +345,6 @@ class HouseShareApp {
                         <h1>欢迎回来</h1>
                         <p>随时随地管理您的房源业务</p>
                     </div>
-                </div>
-
-                <div class="quick-actions">
-                    <a href="#" class="quick-action" id="addSalePropertyBtn">
-                        <i class="ri-home-warm-line"></i>
-                        <span>新增卖房</span>
-                    </a>
-                    <a href="#" class="quick-action" id="addRentPropertyBtn">
-                        <i class="ri-home-line"></i>
-                        <span>新增租房</span>
-                    </a>
-                    <a href="#" class="quick-action" id="viewPropertiesBtn">
-                        <i class="ri-building-2-line"></i>
-                        <span>房源管理</span>
-                    </a>
-                    <a href="#" class="quick-action" id="addClientBtn">
-                        <i class="ri-user-add-line"></i>
-                        <span>新增客户</span>
-                    </a>
-                    <a href="#" class="quick-action" id="publishBtn">
-                        <i class="ri-share-line"></i>
-                        <span>发布朋友圈</span>
-                    </a>
                 </div>
 
                 <div class="stats-cards">
@@ -427,7 +448,7 @@ class HouseShareApp {
 
             <div class="actions-bar" style="margin-bottom: var(--space-xl);">
                 <button class="btn btn-primary" id="addSalePropertyBtn" style="flex: 1;">
-                    <i class="ri-home-warm-line"></i> 新增卖房
+                    <i class="ri-home-line"></i> 新增卖房
                 </button>
                 <button class="btn btn-outline" id="addRentPropertyBtn" style="flex: 1;">
                     <i class="ri-home-line"></i> 新增租房
@@ -1670,8 +1691,8 @@ class HouseShareApp {
                         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                             <div class="form-group">
                                 <label>户型 <button type="button" class="btn btn-icon" style="padding: 2px 6px;" onclick="app.showAddCustomOptionModal('layout')" title="添加户型"><i class="ri-add-line"></i></button></label>
-                                <select id="propertyLayout">
-                                    <option value="">请选择户型</option>
+                                <input type="text" id="propertyLayout" placeholder="请选择或输入户型" list="layoutList">
+                                <datalist id="layoutList">
                                     <option value="1-1">1室1厅</option>
                                     <option value="2-1">2室1厅</option>
                                     <option value="2-2">2室2厅</option>
@@ -1681,15 +1702,13 @@ class HouseShareApp {
                                     <option value="4-2">4室2厅</option>
                                     <option value="4-2-2">4室2厅2卫</option>
                                     <option value="5-2">5室2厅</option>
-                                    <option value="5-3">5室3厅</option>
-                                    <option value="6-3">6室3厅</option>
-                                    ${this.customLayouts.map(l => `<option value="${l}">${l}</option>`).join('')}
-                                </select>
+                                    ${(this.customLayouts || []).map(l => `<option value="${l}">`).join('')}
+                                </datalist>
                             </div>
                             <div class="form-group">
                                 <label>楼层 <button type="button" class="btn btn-icon" style="padding: 2px 6px;" onclick="app.showAddCustomOptionModal('floor')" title="添加楼层"><i class="ri-add-line"></i></button></label>
-                                <select id="propertyFloor">
-                                    <option value="">请选择楼层</option>
+                                <input type="text" id="propertyFloor" placeholder="请选择或输入楼层" list="floorList">
+                                <datalist id="floorList">
                                     <option value="1">1楼</option>
                                     <option value="2">2楼</option>
                                     <option value="3">3楼</option>
@@ -1720,8 +1739,8 @@ class HouseShareApp {
                                     <option value="28">28楼</option>
                                     <option value="29">29楼</option>
                                     <option value="30">30楼</option>
-                                    ${this.customFloors.map(f => `<option value="${f}">${f}楼</option>`).join('')}
-                                </select>
+                                    ${(this.customFloors || []).map(f => `<option value="${f}">${f}楼</option>`).join('')}
+                                </datalist>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1730,14 +1749,14 @@ class HouseShareApp {
                         </div>
                         <div class="form-group">
                             <label>装修 <button type="button" class="btn btn-icon" style="padding: 2px 6px;" onclick="app.showAddCustomOptionModal('decoration')" title="添加装修"><i class="ri-add-line"></i></button></label>
-                            <select id="propertyDecoration">
-                                <option value="">请选择装修</option>
+                            <input type="text" id="propertyDecoration" placeholder="请选择或输入装修" list="decorationList">
+                            <datalist id="decorationList">
                                 <option value="毛坯">毛坯</option>
                                 <option value="简装">简装</option>
                                 <option value="精装">精装</option>
                                 <option value="豪装">豪装</option>
-                                ${this.customDecorations.map(d => `<option value="${d}">${d}</option>`).join('')}
-                            </select>
+                                ${(this.customDecorations || []).map(d => `<option value="${d}">${d}</option>`).join('')}
+                            </datalist>
                         </div>
                         <div class="form-group">
                             <label>房东姓名</label>
@@ -1805,9 +1824,30 @@ class HouseShareApp {
                 name: title
             });
         }
-        
+
+        // 获取户型、装修、楼层值
+        const layoutValue = document.getElementById('propertyLayout').value;
+        const floorValue = document.getElementById('propertyFloor').value;
+        const decorationValue = document.getElementById('propertyDecoration').value;
+
+        // 自动添加新户型到自定义列表
+        if (layoutValue && !this.customLayouts.includes(layoutValue)) {
+            const defaultLayouts = ['1-1', '2-1', '2-2', '3-1', '3-2', '3-2-2', '4-2', '4-2-2', '5-2', '5-3', '6-3'];
+            if (!defaultLayouts.includes(layoutValue)) {
+                this.customLayouts.push(layoutValue);
+            }
+        }
+
+        // 自动添加新装修到自定义列表
+        if (decorationValue && !this.customDecorations.includes(decorationValue)) {
+            const defaultDecorations = ['毛坯', '简装', '精装', '豪装'];
+            if (!defaultDecorations.includes(decorationValue)) {
+                this.customDecorations.push(decorationValue);
+            }
+        }
+
         const price = parseFloat(document.getElementById('propertyPrice').value) || 0;
-        
+
         const property = {
             id: Date.now(),
             title: title,
@@ -1815,10 +1855,10 @@ class HouseShareApp {
             listingType: listingType,
             price: price,
             area: parseFloat(document.getElementById('propertyArea').value) || 0,
-            layout: document.getElementById('propertyLayout').value,
-            floor: document.getElementById('propertyFloor').value,
+            layout: layoutValue,
+            floor: floorValue,
             doorNumber: document.getElementById('propertyDoorNumber').value,
-            decoration: document.getElementById('propertyDecoration').value,
+            decoration: decorationValue,
             ownerName: document.getElementById('propertyOwnerName').value,
             ownerPhone: document.getElementById('propertyOwnerPhone').value,
             description: document.getElementById('propertyDescription').value,
@@ -2351,31 +2391,31 @@ class HouseShareApp {
                         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                             <div class="form-group">
                                 <label>户型 <button type="button" class="btn btn-icon" style="padding: 2px 6px;" onclick="app.showAddCustomOptionModal('layout')" title="添加户型"><i class="ri-add-line"></i></button></label>
-                                <select id="editPropertyLayout">
-                                    <option value="">请选择户型</option>
-                                    <option value="1-1" ${property.layout === '1-1' ? 'selected' : ''}>1室1厅</option>
-                                    <option value="2-1" ${property.layout === '2-1' ? 'selected' : ''}>2室1厅</option>
-                                    <option value="2-2" ${property.layout === '2-2' ? 'selected' : ''}>2室2厅</option>
-                                    <option value="3-1" ${property.layout === '3-1' ? 'selected' : ''}>3室1厅</option>
-                                    <option value="3-2" ${property.layout === '3-2' ? 'selected' : ''}>3室2厅</option>
-                                    <option value="3-2-2" ${property.layout === '3-2-2' ? 'selected' : ''}>3室2厅2卫</option>
-                                    <option value="4-2" ${property.layout === '4-2' ? 'selected' : ''}>4室2厅</option>
-                                    <option value="4-2-2" ${property.layout === '4-2-2' ? 'selected' : ''}>4室2厅2卫</option>
-                                    <option value="5-2" ${property.layout === '5-2' ? 'selected' : ''}>5室2厅</option>
-                                    <option value="5-3" ${property.layout === '5-3' ? 'selected' : ''}>5室3厅</option>
-                                    <option value="6-3" ${property.layout === '6-3' ? 'selected' : ''}>6室3厅</option>
-                                    ${this.customLayouts.map(l => `<option value="${l}" ${property.layout === l ? 'selected' : ''}>${l}</option>`).join('')}
-                                </select>
+                                <input type="text" id="editPropertyLayout" value="${property.layout || ''}" placeholder="请选择或输入户型" list="editLayoutList">
+                                <datalist id="editLayoutList">
+                                    <option value="1-1">1室1厅</option>
+                                    <option value="2-1">2室1厅</option>
+                                    <option value="2-2">2室2厅</option>
+                                    <option value="3-1">3室1厅</option>
+                                    <option value="3-2">3室2厅</option>
+                                    <option value="3-2-2">3室2厅2卫</option>
+                                    <option value="4-2">4室2厅</option>
+                                    <option value="4-2-2">4室2厅2卫</option>
+                                    <option value="5-2">5室2厅</option>
+                                    <option value="5-3">5室3厅</option>
+                                    <option value="6-3">6室3厅</option>
+                                    ${(this.customLayouts || []).map(l => `<option value="${l}">`).join('')}
+                                </datalist>
                             </div>
                             <div class="form-group">
                                 <label>楼层 <button type="button" class="btn btn-icon" style="padding: 2px 6px;" onclick="app.showAddCustomOptionModal('floor')" title="添加楼层"><i class="ri-add-line"></i></button></label>
-                                <select id="editPropertyFloor">
-                                    <option value="">请选择楼层</option>
+                                <input type="text" id="editPropertyFloor" value="${property.floor || ''}" placeholder="请选择或输入楼层" list="editFloorList">
+                                <datalist id="editFloorList">
                                     ${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30].map(f =>
-                                        `<option value="${f}" ${property.floor == f ? 'selected' : ''}>${f}楼</option>`
+                                        `<option value="${f}">${f}楼</option>`
                                     ).join('')}
-                                    ${this.customFloors.map(f => `<option value="${f}" ${property.floor == f ? 'selected' : ''}>${f}楼</option>`).join('')}
-                                </select>
+                                    ${(this.customFloors || []).map(f => `<option value="${f}">${f}楼</option>`).join('')}
+                                </datalist>
                             </div>
                         </div>
                         <div class="form-group">
@@ -2384,14 +2424,14 @@ class HouseShareApp {
                         </div>
                         <div class="form-group">
                             <label>装修 <button type="button" class="btn btn-icon" style="padding: 2px 6px;" onclick="app.showAddCustomOptionModal('decoration')" title="添加装修"><i class="ri-add-line"></i></button></label>
-                            <select id="editPropertyDecoration">
-                                <option value="">请选择装修</option>
-                                <option value="毛坯" ${property.decoration === '毛坯' ? 'selected' : ''}>毛坯</option>
-                                <option value="简装" ${property.decoration === '简装' ? 'selected' : ''}>简装</option>
-                                <option value="精装" ${property.decoration === '精装' ? 'selected' : ''}>精装</option>
-                                <option value="豪装" ${property.decoration === '豪装' ? 'selected' : ''}>豪装</option>
-                                ${this.customDecorations.map(d => `<option value="${d}" ${property.decoration === d ? 'selected' : ''}>${d}</option>`).join('')}
-                            </select>
+                            <input type="text" id="editPropertyDecoration" value="${property.decoration || ''}" placeholder="请选择或输入装修" list="editDecorationList">
+                            <datalist id="editDecorationList">
+                                <option value="毛坯">毛坯</option>
+                                <option value="简装">简装</option>
+                                <option value="精装">精装</option>
+                                <option value="豪装">豪装</option>
+                                ${(this.customDecorations || []).map(d => `<option value="${d}">`).join('')}
+                            </datalist>
                         </div>
                         <div class="form-group">
                             <label>房东姓名</label>
@@ -2811,6 +2851,24 @@ class HouseShareApp {
             });
         }
 
+        // 获取户型、装修值并添加到自定义列表
+        const editLayoutValue = document.getElementById('editPropertyLayout').value;
+        const editDecorationValue = document.getElementById('editPropertyDecoration').value;
+
+        if (editLayoutValue && !this.customLayouts.includes(editLayoutValue)) {
+            const defaultLayouts = ['1-1', '2-1', '2-2', '3-1', '3-2', '3-2-2', '4-2', '4-2-2', '5-2', '5-3', '6-3'];
+            if (!defaultLayouts.includes(editLayoutValue)) {
+                this.customLayouts.push(editLayoutValue);
+            }
+        }
+
+        if (editDecorationValue && !this.customDecorations.includes(editDecorationValue)) {
+            const defaultDecorations = ['毛坯', '简装', '精装', '豪装'];
+            if (!defaultDecorations.includes(editDecorationValue)) {
+                this.customDecorations.push(editDecorationValue);
+            }
+        }
+
         this.properties[index] = {
             ...this.properties[index],
             title: title,
@@ -3056,7 +3114,11 @@ class HouseShareApp {
             const loadingElement = document.getElementById('pageContent');
             if (loadingElement) {
                 loadingElement.innerHTML = '';
-                this.loadPage('home');
+                // 使用 initialPage 或默认为 home
+                const initialPage = this.initialPage || 'home';
+                // 初始页面使用 replaceState 而不是 pushState
+                history.replaceState({ page: initialPage }, '', '#' + initialPage);
+                this.loadPage(initialPage, false); // false 表示不添加重复历史
             }
         }, 1000);
     }
